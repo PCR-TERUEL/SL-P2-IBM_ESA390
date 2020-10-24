@@ -58,4 +58,8 @@ public class Task {
     public enum TaskType {
         SPECIFIC, GENERAL
     }
+
+    public String toString() {
+        return id + ": " + name + " " + description + " " + ddmm + " " +type;
+    }
 }

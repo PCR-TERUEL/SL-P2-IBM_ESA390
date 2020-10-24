@@ -2,83 +2,58 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class Handler3270 {
     private final Process EMULATOR;
     private static final String IP_HOST = "155.210.152.51";
     private static final int PORT = 101;
-    private static final int EMULATOR_PORT = 5000;
+    private static final String EMULATOR_PORT = "5000";
     private static final String USER = "grupo_01";
     private static final String PASSWORD = "secreto6";
-
-
+    private static final String S3270_PATH = "C:\\Program Files\\wc3270\\x3270if.exe";
 
     public Handler3270() throws IOException, InterruptedException {
-        EMULATOR = Runtime.getRuntime().exec("C:\\Program Files\\wc3270\\s3270.exe -scriptport " + EMULATOR_PORT);
+        EMULATOR = Runtime.getRuntime().exec(S3270_PATH + " -scriptport " + EMULATOR_PORT);
         try{
-            /*executeCommand("connect(" + IP_HOST + ":" + PORT + ")");
-            executeCommand("Enter");
-            Thread.sleep(1500);
-            System.out.println(getScreen());*/
             startProgram();
-            //System.out.println(getScreen());
-            assignTask(new Task("descrip uno", 0, 1902,null, Task.TaskType.GENERAL));
-            assignTask(new Task("describ dos", 0, 1902,"null1a", Task.TaskType.SPECIFIC));
-            assignTask(new Task("desc tres", 0, 1903,"null", Task.TaskType.GENERAL));
-            assignTask(new Task("desiptone", 0, 2202,"name one", Task.TaskType.GENERAL));
-            assignTask(new Task("deiption", 0, 2002,"name", Task.TaskType.SPECIFIC));
-            assignTask(new Task("desc tres", 0, 1903,"null", Task.TaskType.GENERAL));
-            assignTask(new Task("desiptone", 0, 2202,"name one", Task.TaskType.GENERAL));
-            assignTask(new Task("deiption", 0, 2002,"name", Task.TaskType.SPECIFIC));
-            assignTask(new Task("desc tres", 0, 1903,"null", Task.TaskType.GENERAL));
-            assignTask(new Task("desiptone", 0, 2202,"name one", Task.TaskType.GENERAL));
-            assignTask(new Task("deiption", 0, 2002,"name", Task.TaskType.SPECIFIC));
 
-            List<Task> tasks = getTasks();
-            for(Task task: tasks){
-                System.out.println("///////////////////////////////////////////////////////////////");
-                System.out.println(task.getId() + "\\" + task.getType() + "\\" + task.getDdmm() + "\\" + task.getName() + "\\" + task.getDescription());
-                System.out.println("///////////////////////////////////////////////////////////////");
+            assignTask(new Task("Desc 0", 0, 1902,null, Task.TaskType.GENERAL));
+            assignTask(new Task("Desc 1", 0, 1902,"null1a", Task.TaskType.SPECIFIC));
+            assignTask(new Task("Desc 2", 0, 1903,"null", Task.TaskType.GENERAL));
+            assignTask(new Task("Desc 3", 0, 2202,"name one", Task.TaskType.GENERAL));
+            assignTask(new Task("Desc 4", 0, 2002,"name", Task.TaskType.SPECIFIC));
+            assignTask(new Task("Desc 5", 0, 1903,"null", Task.TaskType.GENERAL));
+            assignTask(new Task("Desc 6", 0, 2202,"name one", Task.TaskType.GENERAL));
+            assignTask(new Task("Desc 7", 0, 2002,"name", Task.TaskType.SPECIFIC));
+            assignTask(new Task("Desc 8", 0, 1903,"null", Task.TaskType.GENERAL));
+            assignTask(new Task("Desc 9", 0, 2202,"name one", Task.TaskType.GENERAL));
+            assignTask(new Task("Desc 10", 0, 2002,"name", Task.TaskType.SPECIFIC));
+
+
+            for (Task task : getTasks()) {
+                System.out.println(task);
             }
             disconnect();
         } catch (Exception e) {
-            System.out.println(getScreen());
+            System.out.println("Error: " + getScreen());
             disconnect();
             e.printStackTrace();
         }
     }
 
     public void disconnect() throws IOException, InterruptedException {
-        executeCommand("disconect");
+        executeCommand("Disconect");
     }
 
     private void executeCommand(String command) throws IOException, InterruptedException {
-        Process process = Runtime.getRuntime().exec( new String[]{"C:\\Program Files\\wc3270\\x3270if.exe", "-t",
-                    String.valueOf(EMULATOR_PORT), command});
-        process.waitFor();
-
-        //Si se rompe al realizar comandos, aumentar el tiempo de espera
-        Thread.sleep(1000);
-
+        Runtime.getRuntime().exec(new String[]{S3270_PATH, "-t", EMULATOR_PORT, command}).waitFor();
+        Thread.sleep(750);
     }
-
-    /*private String getErrors() throws IOException {
-        Process process = Runtime.getRuntime().exec( new String[]{"C:\\Program Files\\wc3270\\x3270if.exe", "-t",
-                String.valueOf(EMULATOR_PORT), "ascii"});
-        BufferedReader errorReader =  new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        String errorLine = errorReader.readLine();
-        while (errorLine != null) {
-            System.out.println(errorLine);
-            errorLine = errorReader.readLine();
-        }
-    }*/
 
     private String getScreen() throws IOException, InterruptedException {
         String screen = "";
-        Process process = Runtime.getRuntime().exec( new String[]{"C:\\Program Files\\wc3270\\x3270if.exe", "-t",
-                String.valueOf(EMULATOR_PORT), "ascii"});
+        Process process = Runtime.getRuntime().exec(new String[]{S3270_PATH, "-t", EMULATOR_PORT, "ascii"});
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         process.waitFor();
         String readerLine = reader.readLine();
@@ -91,22 +66,22 @@ public class Handler3270 {
 
 
     private void startProgram() throws IOException, InterruptedException {
-        System.out.println("ENTROOOOOOOOOOOOOOOOOOOOOOOOOO");
+        System.out.println("Starting mainframe connection...");
         List<String> startCommands = List.of("connect(" + IP_HOST + ":" + PORT + ")", "Enter",
                 "String(\"" + USER + "\")", "Enter",  "String(\"" + PASSWORD + "\")", "Enter", "Enter",
                 "String(\"tareas.c\")", "Enter", "wait(InputField)");
         for(String command: startCommands){
             executeCommand(command);
         }
-        System.out.println(getScreen());
-        System.out.println("EMPEZAMOS-----------------------------------------------------------------------");
+
+        System.out.println("Ready. Awaiting user inputs...");
     }
 
 
     public void assignTask(Task task) throws IOException, InterruptedException {
         //Darle al 1, enter,seleccionar tipo tarea (1 General, 2 especifica), enter,
         executeCommand("String(\"1\")");
-        putInMoodRead();
+        checkMainframeStatus();
         executeCommand("Enter");
         task.setDescription(parserIn(task.getDescription()));
 
@@ -118,21 +93,18 @@ public class Handler3270 {
                 assignSpecificTask(task.getName(), task.getDescription(), task.getDdmm());
                 break;
         }
-        System.out.println(getScreen());
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        goMainMenu();
+
+        returnToMainMenu();
+        System.out.println("Assigned task OK: " + task);
     }
 
     private void assignGeneralTask(String description, int date) throws IOException, InterruptedException {
         //dar fecha DDMM, enter, dar descripcion, enter, volver al menu
+
         List<String> assignTaskCommands = List.of("String(\"1\")", "Enter",
                 "String(\"" + date + "\")", "Enter",  "String(\"" + description + "\")", "Enter");
-        for(String command: assignTaskCommands){
-            if(command.startsWith("String")){
-                putInMoodRead();
-            }
-            executeCommand(command);
-        }
+
+        executeCommands(assignTaskCommands);
     }
 
     private boolean emulatorIsNotReading() throws IOException, InterruptedException {
@@ -148,16 +120,10 @@ public class Handler3270 {
                 "String(\"" + date + "\")", "Enter", "String(\"" + name + "\")", "Enter",
                 "String(\"" + description + "\")", "Enter");
 
-        for(String command: assignTaskCommands){
-            System.out.println(command);
-            if(command.startsWith("String")){
-                putInMoodRead();
-            }
-            executeCommand(command);
-        }
+        executeCommands(assignTaskCommands);
     }
 
-    private void goMainMenu() throws IOException, InterruptedException {
+    private void returnToMainMenu() throws IOException, InterruptedException {
         while(isNotMainMenu()){
             executeCommand("String(\"" + 3 + "\")");
             executeCommand("Enter");
@@ -167,15 +133,12 @@ public class Handler3270 {
     private Boolean isNotMainMenu() throws IOException, InterruptedException {
         String screen =  getScreen();
         String[] linesScreen = screen.split("\\?");
-        if(linesScreen[linesScreen.length - 2].contains("MENU PRINCIPAL")){
-            //System.out.println(getScreen());
+        if(linesScreen[linesScreen.length - 2].contains("MENU PRINCIPAL")) {
             return false;
-        }else{
-            return true;
         }
+
+        return true;
     }
-
-
 
     //Cambiar los espacios por | para evitar error al asignar tarea
     private String parserIn(String text){
@@ -189,70 +152,57 @@ public class Handler3270 {
 
     public List<Task> getTasks() throws IOException, InterruptedException {
         //2 ver tareas, enter
-        System.out.println(getScreen());
         executeCommand("String(\"2\")");
-        putInMoodRead();
+        checkMainframeStatus();
         executeCommand("Enter");
-        System.out.println(getScreen());
         List<Task> tasks = new ArrayList<>();
         tasks.addAll(getGeneralTasks());
         tasks.addAll(getSpecificTasks());
 
         //salida al 3, enter --> menu
-        goMainMenu();
-        System.out.println(getScreen());
+        returnToMainMenu();
         return tasks;
     }
 
     private List<Task> getSpecificTasks() throws IOException, InterruptedException {
         //2 para elegir especifica, enter,
-        System.out.println("ENTRO GET SPECIFIC TASK");
-        System.out.println(getScreen());
         executeCommand("String(\"2\")");
-        putInMoodRead();
-        System.out.println(getScreen());
+        checkMainframeStatus();
         executeCommand("Enter");
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        checkMainframeStatus();
         System.out.println(getScreen());
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        List<Task> tasks = scrapeTasks();
-        System.out.println("SALGO DE GET SPECIFIC TASK");
-        return tasks;
+        return scrapeTasks();
     }
 
     private List<Task> getGeneralTasks() throws IOException, InterruptedException {
         //1 para elegir general, enter,
-        putInMoodRead();
+        checkMainframeStatus();
         executeCommand("String(\"1\")");
-
         executeCommand("Enter");
-       // executeCommand("Enter");
+        checkMainframeStatus();
         List<Task> tasks = scrapeTasks();
+
         return tasks;
     }
 
     private List<Task> scrapeTasks() throws IOException, InterruptedException {
-       // System.out.println(getScreen());
         List<Task> tasks = new ArrayList<>();
         String[] linesScreen = getScreen().split("TOTAL TASK");
         String[] lastData = linesScreen[linesScreen.length - 2].split("\\?");
 
-        System.out.println("******************************************************************************");
         lastData = lastData[lastData.length - 1].split("\n");
         for (String data: lastData){
-            System.out.println(data);
             if(data.startsWith("TASK ")){
                 tasks.add(parseTask(data));
             }
         }
-        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
         return tasks;
     }
 
-    private void putInMoodRead() throws IOException, InterruptedException {
+    private void checkMainframeStatus() throws IOException, InterruptedException {
         while(emulatorIsNotReading()){
-            System.out.println("Not in mood Read");
+            System.out.println("Not reading...");
             executeCommand("Enter");
         }
     }
@@ -273,6 +223,15 @@ public class Handler3270 {
         return  task;
     }
 
+    private void executeCommands(List<String> commands) throws IOException, InterruptedException {
+        for(String command : commands) {
+            if(command.startsWith("String")){
+                checkMainframeStatus();
+            }
+            executeCommand(command);
+        }
+    }
+
     public static void main (String [] args){
         try {
             Handler3270 s3270Handler = new Handler3270();
@@ -280,5 +239,6 @@ public class Handler3270 {
             e.printStackTrace();
         }
     }
+
 }
 
