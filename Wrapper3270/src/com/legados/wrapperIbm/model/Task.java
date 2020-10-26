@@ -1,3 +1,5 @@
+package com.legados.wrapperIbm.model;
+
 public class Task {
     private String description;
     private int id;

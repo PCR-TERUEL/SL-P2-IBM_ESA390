@@ -1,3 +1,4 @@
+package com.legados.wrapperIbm.model;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,7 +10,7 @@ public class Handler3270 {
     private static final String IP_HOST = "155.210.152.51";
     private static final int PORT = 101;
     private static final String EMULATOR_PORT = "5000";
-    private static final String USER = "grupo_02";
+    private static final String USER = "grupo_01";
     private static final String PASSWORD = "secreto6";
     private static final String S3270_PATH = "C:\\Program Files\\wc3270\\x3270if.exe";
 
@@ -20,8 +21,11 @@ public class Handler3270 {
 
             assignTask(new Task("Desc 0", 0, 1902,null, Task.TaskType.GENERAL));
             assignTask(new Task("Desc 1", 0, 1902,"null1a", Task.TaskType.SPECIFIC));
-            assignTask(new Task("Desc 2", 0, 1903,"null", Task.TaskType.GENERAL));
-            assignTask(new Task("Desc 3", 0, 2202,"name one", Task.TaskType.GENERAL));
+            assignTask(new Task("asdf", 0, 1233,"asdf", Task.TaskType.SPECIFIC));
+            assignTask(new Task("sadf", 0, 1233,"null", Task.TaskType.GENERAL));
+            assignTask(new Task("test", 0, 0101,"null", Task.TaskType.GENERAL));
+
+            /*assignTask(new Task("Desc 3", 0, 2202,"name one", Task.TaskType.GENERAL));
             assignTask(new Task("Desc 4", 0, 2002,"name", Task.TaskType.SPECIFIC));
             assignTask(new Task("Desc 5", 0, 1903,"null", Task.TaskType.GENERAL));
             assignTask(new Task("Desc 6", 0, 2202,"name one", Task.TaskType.GENERAL));
@@ -33,7 +37,7 @@ public class Handler3270 {
 
             for (Task task : getTasks()) {
                 System.out.println(task);
-            }
+            }*/
             disconnect();
         } catch (Exception e) {
             System.out.println("Error: " + getScreen());
@@ -233,11 +237,11 @@ public class Handler3270 {
 
     public static void main (String [] args){
         try {
-            new Handler3270();
+            Handler3270 h = new Handler3270();
+            h.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 }
-
