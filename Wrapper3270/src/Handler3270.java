@@ -9,12 +9,12 @@ public class Handler3270 {
     private static final String IP_HOST = "155.210.152.51";
     private static final int PORT = 101;
     private static final String EMULATOR_PORT = "5000";
-    private static final String USER = "grupo_01";
+    private static final String USER = "grupo_02";
     private static final String PASSWORD = "secreto6";
     private static final String S3270_PATH = "C:\\Program Files\\wc3270\\x3270if.exe";
 
     public Handler3270() throws IOException, InterruptedException {
-        EMULATOR = Runtime.getRuntime().exec(S3270_PATH + " -scriptport " + EMULATOR_PORT);
+        EMULATOR = Runtime.getRuntime().exec("C:\\Program Files\\wc3270\\s3270.exe -scriptport " + EMULATOR_PORT);
         try{
             startProgram();
 
@@ -170,7 +170,6 @@ public class Handler3270 {
         checkMainframeStatus();
         executeCommand("Enter");
         checkMainframeStatus();
-        System.out.println(getScreen());
         return scrapeTasks();
     }
 
@@ -234,7 +233,7 @@ public class Handler3270 {
 
     public static void main (String [] args){
         try {
-            Handler3270 s3270Handler = new Handler3270();
+            new Handler3270();
         } catch (Exception e) {
             e.printStackTrace();
         }
