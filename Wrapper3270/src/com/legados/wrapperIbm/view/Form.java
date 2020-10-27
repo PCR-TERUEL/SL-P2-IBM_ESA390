@@ -21,7 +21,7 @@ import javax.swing.*;
  * dados y se encarga de enviar los datos introducidos en la vista.
  */
 public class Form extends JPanel{
-    private Task task;
+
 
 
     private JLabel lbDate;
@@ -112,14 +112,12 @@ public class Form extends JPanel{
             task.setType(Task.TaskType.SPECIFIC);
         }
         if(tfDate.getText().equals("")){
-            task.setDdmm(0000);
+            task.setDdmm(0);
         }else{
             task.setDdmm(Integer.parseInt(tfDate.getText()));
         }
         if(tfName.isEnabled()) {
             task.setName(tfName.getText());
-        }else{
-            task.setName("null");
         }
 
         return task;
@@ -165,13 +163,33 @@ public class Form extends JPanel{
         }else{
             tfDescription.setBackground(new Color(255,255,255));
         }
-        if(tfDate.getText().length() != 4){
+        if(tfDate.getText().length() != 4 || !isNumber(tfDate.getText())){
             tfDate.setBackground(color);
             correct = false;
         }else{
             tfDate.setBackground(new Color(255,255,255));
         }
 
+        if(tfDescription.getText().length() + tfName.getText().length() > 14){
+            tfDescription.setBackground(color);
+            tfName.setBackground(color);
+            correct = false;
+        }else{
+            tfDescription.setBackground(new Color(255,255,255));
+            tfName.setBackground(new Color(255,255,255));
+        }
         return correct;
+    }
+
+    private boolean isNumber(String number) {
+        if (number == null) {
+            return false;
+        }
+        try {
+            double d = Integer.parseInt(number);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 }

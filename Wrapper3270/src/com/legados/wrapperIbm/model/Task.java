@@ -1,5 +1,8 @@
 package com.legados.wrapperIbm.model;
 
+/**
+ * Clase que define el comportamiento de una tarea
+ */
 public class Task {
     private String description;
     private int id;

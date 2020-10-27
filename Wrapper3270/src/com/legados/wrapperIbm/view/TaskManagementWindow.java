@@ -136,6 +136,10 @@ public class TaskManagementWindow extends JFrame implements ActionListener{
         add(scrollTaskTable,BorderLayout.CENTER);
     }
 
+    public void manageConnected(){
+        enableEvent(WindowState.CONNECTED);
+
+    }
     /*
      * Habilita o deshabilita los elementos de la vista dependiendo del estado
      * pasado por parametro.
@@ -152,6 +156,13 @@ public class TaskManagementWindow extends JFrame implements ActionListener{
                 table.setEnabled(false);
                 break;
             case START:
+                form.enableEvent(false);
+                table.setEnabled(true);
+                btNew.setEnabled(false);
+                btSave.setEnabled(false);
+                btCancel.setEnabled(false);
+                break;
+            case CONNECTED:
                 form.enableEvent(false);
                 table.setEnabled(true);
                 btNew.setEnabled(true);
@@ -172,7 +183,7 @@ public class TaskManagementWindow extends JFrame implements ActionListener{
             case "guardar":
                 if(form.verifyFields()){
                     wObserver.eventHappened(WindowObserver.Event.NEW,form.getTask());
-                    enableEvent(WindowState.START);
+                    enableEvent(WindowState.CONNECTED);
                 }
                 break;
             case "nuevo":
@@ -181,7 +192,7 @@ public class TaskManagementWindow extends JFrame implements ActionListener{
             case "cancelar":
                 cleanFields();
                 table.clearSelection();
-                enableEvent(WindowState.START);
+                enableEvent(WindowState.CONNECTED);
                 break;
         }
     }
@@ -246,7 +257,7 @@ public class TaskManagementWindow extends JFrame implements ActionListener{
     }
 
     public enum WindowState {
-        START, NEW,
+        START, NEW, CONNECTED
     }
 }
 

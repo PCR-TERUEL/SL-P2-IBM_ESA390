@@ -6,6 +6,9 @@ import com.legados.wrapperIbm.view.TaskManagementWindow;
 
 import java.io.*;
 
+/**
+ * Clase que gestiona el control de la aplicación de gestión de notas.
+ */
 public class TasksManager implements WindowObserver {
     TaskManagementWindow window;
     Model model;
@@ -14,6 +17,7 @@ public class TasksManager implements WindowObserver {
             window = new TaskManagementWindow(this, null);
             model = new Model();
             window.setModel(model);
+            window.manageConnected();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -24,12 +28,18 @@ public class TasksManager implements WindowObserver {
         new TasksManager();
     }
 
+    /**
+     * Reacciona a un evento sucedido en la vista
+     * @param event evento sucedido en la vista
+     * @param obj contenido de interés para la gestión del evento.
+     */
     @Override
     public void eventHappened(Event event, Object obj) {
         try {
             switch (event) {
                 case NEW:
-                    if (model.createTask((Task) obj)) {
+                    if(model != null) {
+                        model.createTask((Task) obj);
                         window.cleanFields();
                         window.refreshTable();
                     }
@@ -38,12 +48,14 @@ public class TasksManager implements WindowObserver {
                         model.disconect();
                     break;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            manageForcedDisconnection();
         }
     }
+
+    /**
+     * Reacciona cuando la conexión con el servidor se ha perdido o bien se ha producido algún problema con el servidor.
+     */
     public void manageForcedDisconnection(){
         window.showError();
         try {
