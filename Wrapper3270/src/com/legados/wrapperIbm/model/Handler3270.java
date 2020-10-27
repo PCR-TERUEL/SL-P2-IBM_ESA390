@@ -16,38 +16,13 @@ public class Handler3270 {
 
     public Handler3270() throws IOException, InterruptedException {
         EMULATOR = Runtime.getRuntime().exec("C:\\Program Files\\wc3270\\s3270.exe -scriptport " + EMULATOR_PORT);
-        try{
-            startProgram();
+        disconnect(); //Se usa por si la aplicación se ha parado anteriormente si desconectar la sesión.
+        startProgram();
 
-            assignTask(new Task("Desc 0", 0, 1902,null, Task.TaskType.GENERAL));
-            assignTask(new Task("Desc 1", 0, 1902,"null1a", Task.TaskType.SPECIFIC));
-            assignTask(new Task("asdf", 0, 1233,"asdf", Task.TaskType.SPECIFIC));
-            assignTask(new Task("sadf", 0, 1233,"null", Task.TaskType.GENERAL));
-            assignTask(new Task("test", 0, 0101,"null", Task.TaskType.GENERAL));
-
-            /*assignTask(new Task("Desc 3", 0, 2202,"name one", Task.TaskType.GENERAL));
-            assignTask(new Task("Desc 4", 0, 2002,"name", Task.TaskType.SPECIFIC));
-            assignTask(new Task("Desc 5", 0, 1903,"null", Task.TaskType.GENERAL));
-            assignTask(new Task("Desc 6", 0, 2202,"name one", Task.TaskType.GENERAL));
-            assignTask(new Task("Desc 7", 0, 2002,"name", Task.TaskType.SPECIFIC));
-            assignTask(new Task("Desc 8", 0, 1903,"null", Task.TaskType.GENERAL));
-            assignTask(new Task("Desc 9", 0, 2202,"name one", Task.TaskType.GENERAL));
-            assignTask(new Task("Desc 10", 0, 2002,"name", Task.TaskType.SPECIFIC));
-
-
-            for (Task task : getTasks()) {
-                System.out.println(task);
-            }*/
-            disconnect();
-        } catch (Exception e) {
-            System.out.println("Error: " + getScreen());
-            disconnect();
-            e.printStackTrace();
-        }
     }
 
     public void disconnect() throws IOException, InterruptedException {
-        executeCommand("Disconect");
+        executeCommand("Disconnect");
     }
 
     private void executeCommand(String command) throws IOException, InterruptedException {
@@ -136,8 +111,17 @@ public class Handler3270 {
 
     private Boolean isNotMainMenu() throws IOException, InterruptedException {
         String screen =  getScreen();
-        String[] linesScreen = screen.split("\\?");
-        if(linesScreen[linesScreen.length - 2].contains("MENU PRINCIPAL")) {
+        String[] linesScreen;
+        int position = 0;
+        if(emulatorIsNotReading()) {
+            linesScreen = screen.split("------T-----------------------------------------------------------------T");
+            linesScreen = linesScreen[linesScreen.length - 2].split("\\?");
+            position = linesScreen.length - 1;
+        }else {
+            linesScreen = screen.split("\\?");
+            position = linesScreen.length - 2;
+        }
+        if(linesScreen[position].contains("MENU PRINCIPAL")) {
             return false;
         }
 
@@ -170,8 +154,8 @@ public class Handler3270 {
 
     private List<Task> getSpecificTasks() throws IOException, InterruptedException {
         //2 para elegir especifica, enter,
-        executeCommand("String(\"2\")");
         checkMainframeStatus();
+        executeCommand("String(\"2\")");
         executeCommand("Enter");
         checkMainframeStatus();
         return scrapeTasks();
@@ -179,10 +163,9 @@ public class Handler3270 {
 
     private List<Task> getGeneralTasks() throws IOException, InterruptedException {
         //1 para elegir general, enter,
-        checkMainframeStatus();
         executeCommand("String(\"1\")");
-        executeCommand("Enter");
         checkMainframeStatus();
+        executeCommand("Enter");
         List<Task> tasks = scrapeTasks();
 
         return tasks;
@@ -190,17 +173,40 @@ public class Handler3270 {
 
     private List<Task> scrapeTasks() throws IOException, InterruptedException {
         List<Task> tasks = new ArrayList<>();
-        String[] linesScreen = getScreen().split("TOTAL TASK");
-        String[] lastData = linesScreen[linesScreen.length - 2].split("\\?");
+        if (emulatorIsNotReading() && screenTasks()) {
+            String[] linesScreen = getScreen().split("VIEW TASK");
+            String[] lastData = linesScreen[linesScreen.length - 1].split("\n");
+            for (String data : lastData) {
+                if (data.startsWith("TASK ")) {
+                    tasks.add(parseTask(data));
+                }
+            }
+            checkMainframeStatus();
+            lastData = getScreen().split("\\?");
+            lastData = lastData[lastData.length - 1].split("\n");
+            for (String data : lastData) {
+                if (data.startsWith("TASK ")) {
+                    tasks.add(parseTask(data));
+                }
+            }
+        } else {
+            String[] linesScreen = getScreen().split("TOTAL TASK");
+            String[] lastData = linesScreen[linesScreen.length - 2].split("\\?");
 
-        lastData = lastData[lastData.length - 1].split("\n");
-        for (String data: lastData){
-            if(data.startsWith("TASK ")){
-                tasks.add(parseTask(data));
+            lastData = lastData[lastData.length - 1].split("\n");
+            for (String data : lastData) {
+                if (data.startsWith("TASK ")) {
+                    tasks.add(parseTask(data));
+                }
             }
         }
-
         return tasks;
+    }
+
+    private Boolean screenTasks() throws IOException, InterruptedException {
+        String[] linesScreen = getScreen().split("------T-----------------------------------------------------------------T");
+        String[] lastData = linesScreen[linesScreen.length - 1].split("\n");
+        return lastData[lastData.length - 1].equals("TOTAL TASK") || lastData[lastData.length - 1].startsWith("TASK ");
     }
 
     private void checkMainframeStatus() throws IOException, InterruptedException {
@@ -228,20 +234,18 @@ public class Handler3270 {
 
     private void executeCommands(List<String> commands) throws IOException, InterruptedException {
         for(String command : commands) {
-            if(command.startsWith("String")){
-                checkMainframeStatus();
-            }
+            checkMainframeStatus();
             executeCommand(command);
         }
     }
 
-    public static void main (String [] args){
+   /** public static void main (String [] args){
         try {
             Handler3270 h = new Handler3270();
             h.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
 }
